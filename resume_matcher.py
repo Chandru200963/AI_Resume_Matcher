@@ -6,14 +6,22 @@ def clean_text(text):
     text = text.lower()
     for ch in [",", ".", "!", "?", "(", ")", ":"]:
         text = text.replace(ch, "")
-    return text
+    return text.strip()
 
 
 def calculate_similarity(resume, jd):
+    if not resume or not jd:
+        return 0
+
     documents = [resume, jd]
 
-    vectorizer = TfidfVectorizer(stop_words='english')
+    # Removed automatic stopwords to avoid empty vector issue
+    vectorizer = TfidfVectorizer()
+
     tfidf_matrix = vectorizer.fit_transform(documents)
+
+   
+    print("\nDetected Keywords:", vectorizer.get_feature_names_out())
 
     similarity = cosine_similarity(
         tfidf_matrix[0:1],
@@ -32,6 +40,9 @@ def main():
     resume = clean_text(resume)
     jd = clean_text(jd)
 
+    print("\nCleaned Resume:", resume)
+    print("Cleaned JD:", jd)
+
     match_percentage = calculate_similarity(resume, jd)
 
     print("\n--- Result ---")
@@ -45,3 +56,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
